@@ -20,21 +20,20 @@ import argparse
 def get_special_paths(dirname):
     """Given a dirname, returns a list of all its special files."""
     special_paths_list = []
-    pattern_match = '(\w+)__(\w+)__\.(\w+)'
+    pattern_match = r'(\S*)__(\w+)__(\S*)'
     for file_name in os.listdir(dirname):
         if re.match(pattern_match, file_name):
             if file_name not in str(special_paths_list):
-                special_paths_list.append(os.path.abspath(file_name))
+                special_paths_list.append(os.path.join(
+                    os.path.abspath(dirname), file_name))
         else:
             continue
-    for special_path in special_paths_list:
-        print(special_path)
-
     return special_paths_list
 
 
 def copy_to(path_list, dest_dir):
-    """Given a path list and destination dir, copies all files to destination."""
+    """Given a path list and destination dir,
+    copies all files to destination."""
     os.makedirs(dest_dir)
     for path_name in path_list:
         shutil.copy(path_name, dest_dir)
@@ -43,11 +42,12 @@ def copy_to(path_list, dest_dir):
 
 def zip_to(path_list, dest_zip):
     """Creates a zip file containing all files from list."""
-    path_names = ''.join(path_list)
-    print('path names: ', path_names)
-    print('Command I am going to do: ' +
-          'zip', '-j', dest_zip, path_list[0], path_list[1])
-    subprocess.run(['zip', '-j', dest_zip, path_list[0], path_list[1]])
+
+    parameters = ['zip', '-j', dest_zip]
+    for path in path_list:
+        parameters.append(path)
+    print('Command I am going to do: ' + str(parameters))
+    subprocess.run(parameters)
     return
 
 
@@ -57,18 +57,25 @@ def main(args):
     parser = argparse.ArgumentParser()
     parser.add_argument('--todir', help='dest dir for special files')
     parser.add_argument('--tozip', help='dest zipfile for special files')
-    # TODO: add one more argument definition to parse the 'from_dir' argument
+    parser.add_argument('from_dir', help='from directory')
+
     ns = parser.parse_args(args)
+    if not ns:
+        parser.print_usage()
+        sys.exit(1)
+    if len(args) > 1:
+        options = args[1]
+        from_dir = args[2]
+    else:
+        from_dir = args[0]
 
-    # TODO: you must write your own code to get the command line args.
-    # Read the docs and examples for the argparse module about how to do this.
-
-    # Parsing command line arguments is a must-have skill.
-    # This is input data validation. If something is wrong (or missing) with
-    # any required args, the general rule is to print a usage message and
-    # exit(1).
-
-    # Your code here: Invoke (call) your functions
+    if ns.tozip:
+        zip_to(get_special_paths(from_dir), options)
+    if ns.todir:
+        copy_to(get_special_paths(from_dir), options)
+    special_paths_list = get_special_paths(from_dir)
+    for path in special_paths_list:
+        print(path)
 
 
 if __name__ == "__main__":
