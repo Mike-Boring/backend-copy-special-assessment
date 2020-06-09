@@ -7,7 +7,7 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 
 # give credits
-__author__ = "???"
+__author__ = "Mike Boring"
 
 import re
 import os
@@ -19,17 +19,35 @@ import argparse
 
 def get_special_paths(dirname):
     """Given a dirname, returns a list of all its special files."""
-    # your code here
-    return
+    special_paths_list = []
+    pattern_match = '(\w+)__(\w+)__\.(\w+)'
+    for file_name in os.listdir(dirname):
+        if re.match(pattern_match, file_name):
+            if file_name not in str(special_paths_list):
+                special_paths_list.append(os.path.abspath(file_name))
+        else:
+            continue
+    for special_path in special_paths_list:
+        print(special_path)
+
+    return special_paths_list
 
 
 def copy_to(path_list, dest_dir):
-    # your code here
+    """Given a path list and destination dir, copies all files to destination."""
+    os.makedirs(dest_dir)
+    for path_name in path_list:
+        shutil.copy(path_name, dest_dir)
     return
 
 
 def zip_to(path_list, dest_zip):
-    # your code here
+    """Creates a zip file containing all files from list."""
+    path_names = ''.join(path_list)
+    print('path names: ', path_names)
+    print('Command I am going to do: ' +
+          'zip', '-j', dest_zip, path_list[0], path_list[1])
+    subprocess.run(['zip', '-j', dest_zip, path_list[0], path_list[1]])
     return
 
 
