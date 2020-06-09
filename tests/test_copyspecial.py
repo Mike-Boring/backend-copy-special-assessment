@@ -28,6 +28,7 @@ SPL_REGEX = re.compile(r'__(\w+)__')
 
 class Capturing(list):
     """Context Mgr helper for capturing stdout from a function call"""
+
     def __enter__(self):
         self._stdout = sys.stdout
         sys.stdout = self._stringio = StringIO()
@@ -41,6 +42,7 @@ class Capturing(list):
 
 class RandomFileSet:
     """Creates a set of special/notspecial files in a random temp dir"""
+
     def __init__(self):
         self.tmp_dir, self.file_list = self.random_fileset()
         self.abs_file_list = [
@@ -62,7 +64,7 @@ class RandomFileSet:
             prefix
             + "".join(random.sample(string.ascii_lowercase, size))
             + suffix
-            )
+        )
         return filename
 
     def random_fileset(self):
@@ -91,8 +93,8 @@ class TestCopyspecial(unittest.TestCase):
         cls.funcs = {
             k: v for k, v in inspect.getmembers(
                 cls.module, inspect.isfunction
-                )
-            }
+            )
+        }
         # check the funcs for required functions
         assert "get_special_paths" in cls.funcs, \
             "Missing the get_special_paths() function"
@@ -110,13 +112,13 @@ class TestCopyspecial(unittest.TestCase):
         actual_path_list = self.module.get_special_paths('.')
         expected_path_list = [
             os.path.abspath(os.path.join(os.getcwd(), f))
-            for f in(os.listdir('.'))
+            for f in (os.listdir('.'))
             if SPL_REGEX.search(f)
-            ]
+        ]
         self.assertIsInstance(
             actual_path_list, list,
             "get_special_paths is not returning a list"
-            )
+        )
         self.assertListEqual(actual_path_list, expected_path_list)
 
     def test_get_special_paths_2(self):
@@ -125,13 +127,13 @@ class TestCopyspecial(unittest.TestCase):
         self.assertIsInstance(
             actual_path_list, list,
             "get_special_paths is not returning a list"
-            )
+        )
         a = sorted(actual_path_list)
         b = sorted(self.rfs.spl_file_list)
         self.assertListEqual(
             a, b,
             "Returned path list does not match expected path list"
-            )
+        )
 
     def test_copy_to(self):
         """Checking the copy_to function"""
@@ -140,9 +142,9 @@ class TestCopyspecial(unittest.TestCase):
         # Call the test module's copy_to() function
         dest_dir = "/tmp/kenzie-copyto"
         shutil.rmtree(dest_dir, ignore_errors=True)
-        self.module.copy_to(self.rfs.abs_file_list, dest_dir + "/dest")
+        self.module.copy_to(self.rfs.abs_file_list, dest_dir)
         # check if dest_dir was created and all files got copied
-        a = sorted(os.listdir(dest_dir + "/dest"))
+        a = sorted(os.listdir(dest_dir))
         b = sorted(self.rfs.file_list)
         shutil.rmtree(dest_dir, ignore_errors=True)
         self.assertEqual(a, b, "The copy_to function is not working")
@@ -159,7 +161,7 @@ class TestCopyspecial(unittest.TestCase):
         self.assertEqual(
             sorted(dest_files), sorted(self.rfs.file_list),
             "original files are not being zipped"
-            )
+        )
         self.clean(zip_name)
 
     def test_doc_strings(self):
@@ -169,12 +171,12 @@ class TestCopyspecial(unittest.TestCase):
             self.assertIsNotNone(
                 func.__doc__,
                 f'function "{func_name}" is missing a docstring'
-                )
+            )
             # arbitrary length test of at least 10 chars
             self.assertGreaterEqual(
                 len(func.__doc__), 10,
                 "How about a bit more docstring?"
-                )
+            )
 
     def test_main_print(self):
         """Check if the main function is printing the special files list"""
