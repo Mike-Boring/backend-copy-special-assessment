@@ -42,7 +42,6 @@ def copy_to(path_list, dest_dir):
 
 def zip_to(path_list, dest_zip):
     """Creates a zip file containing all files from list."""
-
     parameters = ['zip', '-j', dest_zip]
     for path in path_list:
         parameters.append(path)
@@ -73,9 +72,10 @@ def main(args):
         zip_to(get_special_paths(from_dir), options)
     if ns.todir:
         copy_to(get_special_paths(from_dir), options)
-    special_paths_list = get_special_paths(from_dir)
-    for path in special_paths_list:
-        print(path)
+    else:
+        special_paths_list = get_special_paths(from_dir)
+        for path in special_paths_list:
+            print(path)
 
 
 if __name__ == "__main__":
